@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <bitset>
+#include <map>
 
 std::vector<std::vector<uint8_t>> S1 = { 
     {1,5,2,6,2,6,7,3},
@@ -153,6 +154,108 @@ void GetHexHexXorS3(std::vector<std::vector<uint8_t>>& output, std::vector<uint8
         output.push_back(temp);
     }
 }
+
+
+// Считаем вероятности
+uint8_t GetMaxCount(std::vector<std::vector<uint8_t>> table) {
+    uint8_t max = 0;
+    for (size_t i = 1; i < table.size(); i++)
+    {
+        for (size_t j = 0; j < table[i].size(); j++)
+        {
+            if (table[i][j] > max )
+            {
+                max = table[i][j];
+            }
+        }
+    }
+    return max;
+}
+
+// Берем кусок от DA
+std::vector<uint8_t> GetDiffAnalys(std::vector<std::vector<uint8_t>> table, uint8_t num, std::string row) {
+    std::vector<uint8_t> analys_array;
+    for (size_t i = 1; i < table.size(); i++)
+    {
+        for (size_t j = 0; j < table[i].size(); j++)
+        {
+            if (table[i][j] == num)
+            {
+                if (row == "A")
+                {
+                    analys_array.push_back(i);
+                }
+                if (row == "C")
+                {
+                    analys_array.push_back(j);
+                }
+            }
+        }
+    }
+    return analys_array;
+}
+
+// Найти повторяющиеся приколы в массиве
+std::vector<std::vector<int>> findIdenticalGroups(const std::vector<uint8_t>& table) {
+    std::map<uint8_t, std::vector<int>> groups;
+
+    for (int i = 0; i < table.size(); i++) {
+        groups[table[i]].push_back(i);
+    }
+
+    std::vector<std::vector<int>> result;
+    for (auto& group : groups) {
+        if (group.second.size() > 1) {
+            result.push_back(group.second);
+        }
+    }
+
+    return result;
+}
+
+// Проверяем 
+bool checkNumber(uint16_t num, const std::vector<std::vector<int>>& groups) {
+    std::bitset<12> bits(num);
+
+    for (auto& group : groups) {
+        bool firstBit = bits[11 - group[0]];
+
+        for (int i = 1; i < group.size(); i++) {
+            if (bits[11 - group[i]] != firstBit) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Проверяем количество по p12
+bool checkNumberAlt(uint16_t num, const std::vector<std::vector<int>>& groups) {
+    for (auto& group : groups) {
+        bool firstBit = num & (1 << (11 - group[0]));
+
+        for (int i = 1; i < group.size(); i++) {
+            bool currentBit = num & (1 << (11 - group[i]));
+            if (currentBit != firstBit) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Получаем DC
+uint8_t GetCByMaxAndPieceOfA(std::vector<std::vector<uint8_t>> table, uint8_t piece, uint8_t max) {
+    uint8_t x = 0;
+    for (size_t i = 0; i <= piece; i++)
+    {
+        for (size_t j = 0; j < table[i].size(); j++)
+        {
+            x = table[i][j] == max ? j : x;
+         }
+    }
+    return x;
+}
 int main()
 {
     std::cout << "S1";
@@ -203,6 +306,60 @@ int main()
             std::cout << "\t" << static_cast<int>(s3_count[i][j]);
         }
         std::cout << "\n----------------------------------------------------------------------------------\n";
+    }
+    uint8_t max_S1 = GetMaxCount(s1_count);
+    uint8_t max_S2 = GetMaxCount(s2_count);
+    uint8_t max_S3 = GetMaxCount(s3_count);
+
+    std::vector<uint8_t> diff_s1 = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "A");
+    std::vector<uint8_t> diff_s2 = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "A");
+    std::vector<uint8_t> diff_s3 = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "A");
+    std::vector<uint8_t> diff_s1_с = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "C");
+    std::vector<uint8_t> diff_s2_с = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "C");
+    std::vector<uint8_t> diff_s3_с = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "C");
+
+
+    std::cout << "SADFWEJRHWJERWER    " << static_cast<int>(diff_s2_с[0]) << "\n";
+
+
+    std::vector<uint16_t> numbers;
+    for (size_t i = 0; i < diff_s1.size(); i++)
+    {
+        for (size_t j = 0; j < diff_s2.size(); j++)
+        {
+            for (size_t k = 0; k < diff_s3.size(); k++)
+            {
+                uint16_t concatenated = (diff_s1[i] << 8) | (diff_s2[j] << 4) | diff_s3[k];
+                numbers.push_back(concatenated);
+            }
+        }
+    }
+
+    auto groups = findIdenticalGroups(shuffleP12);
+    std::vector<uint16_t> valid_numbers_A;
+    for (uint16_t num : numbers) {
+        if (checkNumber(num, groups)) {
+            valid_numbers_A.push_back(num);
+            std::cout << std::bitset<12>(num) << "\n";
+        }
+    }
+    std::vector<uint8_t> valid_numbers_C;
+    for (uint8_t number : valid_numbers_A)
+    {
+        uint8_t first_4_bits = (number >> 7) & 0x0F;
+
+        uint8_t second_4_bits = (number >> 4) & 0x0F; 
+        uint8_t third_4_bits = number & 0x0F;
+
+        std::cout << std::bitset<3>(GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1)) << "\n";
+        std::cout << std::bitset<3>(GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2)) << "\n";
+        std::cout << std::bitset<2>(GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3)) << "\n";
+
+        uint8_t concatenated = (GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1) << 5) | (GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2) << 2) | GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3);
+
+        valid_numbers_C.push_back(concatenated);
+
+        std::cout << std::bitset<8>(concatenated) << "\n";
     }
     std::cout << "Hello World!\n";
 }

@@ -18,6 +18,7 @@ std::vector<std::vector<uint8_t>> S3 = {
     {1,0,3,1},
     {3,0,0,1}
 };
+
 std::vector<uint8_t > shuffleP8 = {4,7,5,3,6,8,2,1};
 std::vector<uint8_t > shuffleP12 = {2,8,3,5,1,6,7,4,2,5,8,1};
 
@@ -393,6 +394,20 @@ std::vector<uint8_t> GetKeyVariants(
     return GetSameValsVector(variantsInp1, variantsInp2);
 }
 
+uint8_t applyInversePermutation8(const std::vector<uint8_t>& P, uint8_t x)
+{
+    std::vector<uint8_t> P_inv(8);
+    for (int i = 0; i < 8; i++) {
+        P_inv[P[i] - 1] = i + 1;
+    }
+    uint8_t out = 0;
+    for (int i = 0; i < 8; i++) {
+        uint8_t bit = (x >> (8 - P_inv[i])) & 1;
+        out |= bit << (7 - i);
+    }
+    return out;
+}
+
 int main()
 {
     //std::cout << "S1";
@@ -562,6 +577,9 @@ int main()
     std::vector<uint8_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
     std::vector<uint8_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
 
+
+    // -------------------------------------------------------------------------------------------------------- Подбор
+
     // Считаем xr/s
     /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
     std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";*/
@@ -640,9 +658,91 @@ int main()
     }
     //std::vector<uint8_t> delC3;
 
-    
+    std::vector<std::vector<int>> key_statistic3(3, std::vector<int>(16, 0));
+    std::vector<uint8_t> YR = { 0b01101011 };
+    std::vector<uint8_t> YRS = { 0b11110101 };
+    std::vector<uint8_t> delYL = { 0b10101111 };
+    for (size_t i = 0; i < YR.size(); i++)
+    {
+
+        std::vector<uint8_t> delA1Input2Y = GetXorWithParameter(input1, delA1);
+        std::vector<uint8_t> delA2Input2Y = GetXorWithParameter(input1, delA2);
+        std::vector<uint8_t> delA3Input2Y = GetXorWithParameter(input1, delA3);
+
+        // Этот вход константа
+        std::vector<uint8_t> exit1DelConstY = SBlockFirstSecondExit(input1, S1);
+        std::vector<uint8_t> exit1DelConst2Y = SBlockFirstSecondExit(input1, S2);
+        std::vector<uint8_t> exit1DelConst3Y = SBlockThirdExit(input1, S3);
+
+        // Получили выход 2 для всего этого
+        std::vector<uint8_t> exit2DelA1Y = SBlockFirstSecondExit(delA1Input2Y, S1);
+        std::vector<uint8_t> exit2DelA2Y = SBlockFirstSecondExit(delA2Input2Y, S2);
+        std::vector<uint8_t> exit2DelA3Y = SBlockThirdExit(delA3Input2Y, S3);
+
+        // Получаем дельта C
+        std::vector<uint8_t> delC1;
+        std::vector<uint8_t> delC2;
+        std::vector<uint8_t> delC3;
+        XorTwoTables(delC1, exit1DelConst, exit2DelA1Y);
+        XorTwoTables(delC2, exit1DelConst2, exit2DelA2Y);
+        XorTwoTables(delC3, exit1DelConst3, exit2DelA3Y);
+
+        uint8_t delYLShuffeled = applyInversePermutation8(shuffleP8, delYL[i]);
+        std::cout << "Shuffeled delYL " << std::bitset<8>(delYLShuffeled) << "\n";
+        uint8_t delC1Needed = (delYLShuffeled >> 5) & 7;
+
+        std::vector<uint8_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
+        std::vector<uint8_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
+
+        uint8_t delC2Needed = (delYLShuffeled >> 2) & 7;
+
+        std::vector<uint8_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
+        std::vector<uint8_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
+
+        // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
+        uint16_t EYR = expandByTable(YR[i]);
+        uint16_t EYRS = expandByTable(YRS[i]);
+
+        std::vector<uint8_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, EYR, EYRS, 8);
+        std::vector<uint8_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, EYR, EYRS, 4);
+        std::vector<uint8_t> k13Variants = GetKeyVariants(c3NeededKeysExit1, c3NeededKeysExit2, EYR, EYRS, 0);
 
 
+
+        // -------------------------- 3
+        uint8_t delC3Needed = delYLShuffeled & 3;
+
+        // Получаем первые два столбика (вход1 и вход2) для deltaC2 
+        std::vector<uint8_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
+        std::vector<uint8_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
+
+        for (uint8_t value : k11Variants) {
+            if (value < 16) {
+                key_statistic3[0][value]++;
+            }
+        }
+
+        for (uint8_t value : k12Variants) {
+            if (value < 16) {
+                key_statistic3[1][value]++;
+            }
+        }
+
+        for (uint8_t value : k13Variants) {
+            if (value < 16) {
+                key_statistic3[2][value]++;
+            }
+        }
+    }
+
+    std::cout << "Val\t\tk13\tk13\tk13" << std::endl;
+    for (int value = 0; value < 16; ++value) {
+        std::cout << std::bitset<4>(value) << "\t\t";
+        std::cout << key_statistic3[0][value] << "\t"
+            << key_statistic3[1][value] << "\t"
+            << key_statistic3[2][value] << std::endl;
+    }
+        std::vector<uint8_t> c3NeededKeysExit24;
 
     std::cout << "Hello World!\n";
 }

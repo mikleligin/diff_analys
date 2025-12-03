@@ -142,7 +142,7 @@ void GetHexHexXorS3(std::vector<std::vector<uint8_t>>& output, std::vector<uint8
     {
         std::vector<uint8_t> temp;
         std::vector<uint8_t> dci = DifXorS3(i, S);
-        std::cout << "\n\n";
+        //std::cout << "\n\n";
         for (size_t j = 0; j < dci.size(); j++)
         {
             std::bitset<3> d1(dci[j]);
@@ -256,16 +256,132 @@ uint8_t GetCByMaxAndPieceOfA(std::vector<std::vector<uint8_t>> table, uint8_t pi
     }
     return x;
 }
+uint8_t applyP12(uint16_t in12)
+{
+    uint8_t out = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        uint8_t bit = (in12 >> (12 - shuffleP12[i])) & 1;
+        out |= bit << (7 - i);
+    }
+    std::cout << std::bitset<8>(out) << std::endl;
+    return out;
+}
+
+uint8_t computeDXR(const std::vector<uint8_t>& P12, uint16_t DA)
+{
+    uint8_t invP[8] = { 0 };
+    for (int i = 0; i < 8; i++)
+    {
+        uint8_t outPos = i + 1;
+        uint8_t inPos = P12[i];
+        invP[inPos - 1] = outPos;
+    }
+
+    uint8_t DXR = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        uint8_t srcBit = invP[i];
+        uint8_t bit = (DA >> (12 - srcBit)) & 1;
+        DXR |= bit << (7 - i);
+    }
+
+    return DXR;
+}
+uint8_t applyPermutation8(const std::vector<uint8_t>& P, uint8_t x)
+{
+    uint8_t out = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        uint8_t bit = (x >> (8 - P[i])) & 1;
+        out |= bit << (7 - i);
+    }
+    return out;
+}
+
+uint16_t expandByTable(uint8_t input) {
+    uint16_t result = 0;
+
+    for (size_t i = 0; i < shuffleP12.size(); i++) {
+        uint8_t bitIndex = shuffleP12[i];
+        uint8_t bit = (input >> (8 - bitIndex)) & 1;
+
+        result <<= 1;
+        result |= bit;
+    }
+
+    return result;
+}
+
+
+std::vector<uint8_t> GetXorWithParameter(std::vector<uint8_t> s_block_out, uint8_t diff) {
+    std::vector<uint8_t> output;
+    for (size_t i = 0; i <= DAi; i++)
+    {
+        uint8_t temp = s_block_out[i] ^ diff;
+        output.push_back(temp);
+    }
+    return output;
+}
+
+std::vector<uint8_t> GetXorWithParameterVector(std::vector<uint8_t> s_block_out, uint8_t diff) {
+    std::vector<uint8_t> output;
+    for (size_t i = 0; i < s_block_out.size(); i++)
+    {
+        uint8_t temp = s_block_out[i] ^ diff;
+        output.push_back(temp);
+    }
+    return output;
+}
+
+void XorTwoTables(std::vector<uint8_t> &out, std::vector<uint8_t> first, std::vector<uint8_t> second) {
+    std::vector<uint8_t> output;
+    for (size_t i = 0; i < first.size(); i++)
+    {
+        uint8_t temp = first[i] ^ second[i];
+        out.push_back(temp);
+    }
+}
+
+std::vector<uint8_t> getRightCOutputs(std::vector<uint8_t> input_array, std::vector<uint8_t> input_c_row, uint8_t c) {
+    std::vector<uint8_t> temp;
+    for (size_t i = 0; i < input_c_row.size(); i++)
+    {
+        if (input_c_row[i] == c)
+        {
+            temp.push_back(input_array[i]);
+        }
+        
+    }
+    return temp;
+}
+
+std::vector<uint8_t> GetSameValsVector(std::vector<uint8_t> a, std::vector<uint8_t> b)
+{
+    std::vector<uint8_t> temp;
+    for (size_t i = 0; i < a.size(); i++)
+    {
+        for (size_t j = 0; j < b.size(); j++)
+        {
+            if (a[i] == b[j])
+            {
+                temp.push_back(a[i]);
+            }
+        }
+    }
+    return temp;
+}
+
 int main()
 {
-    std::cout << "S1";
+    //std::cout << "S1";
     std::vector<uint8_t> input1 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
     std::vector<uint8_t> s1_out = SBlockFirstSecondExit(input1, S1);
-    std::cout << "\nS2";
-    std::cout << "\n";
+    //std::cout << "\nS2";
+    //std::cout << "\n";
     std::vector<uint8_t> s2_out = SBlockFirstSecondExit(input1, S2);
-    std::cout << "\nS3";
-    std::cout << "\n";
+    //std::cout << "\nS3";
+   // std::cout << "\n";
     std::vector<uint8_t> s3_out = SBlockThirdExit(input1, S3);
     std::vector<std::vector<uint8_t>> final_out_xor_s1;
     std::vector<std::vector<uint8_t>> final_out_xor_s2;
@@ -282,30 +398,30 @@ int main()
         std::vector<uint8_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
-            std::cout << "\t" << static_cast<int>(s1_count[i][j]);
+            //std::cout << "\t" << static_cast<int>(s1_count[i][j]);
         }
-        std::cout << "\n----------------------------------------------------------------------------------\n";
+       //std::cout << "\n----------------------------------------------------------------------------------\n";
     }
-    std::cout << "\n========================================2========================================\n\n\n";
+    //std::cout << "\n========================================2========================================\n\n\n";
     for (size_t i = 0; i <= 15; i++)
     {
         std::vector<uint8_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
-            std::cout << "\t" << static_cast<int>(s2_count[i][j]);
+            //std::cout << "\t" << static_cast<int>(s2_count[i][j]);
         }
-        std::cout << "\n----------------------------------------------------------------------------------\n";
+        //std::cout << "\n----------------------------------------------------------------------------------\n";
     }
-    std::cout << "\n========================================3========================================\n\niggers\n";
+    //std::cout << "\n========================================3========================================\n\niggers\n";
     
     for (size_t i = 0; i <= 15; i++)
     {
         std::vector<uint8_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
-            std::cout << "\t" << static_cast<int>(s3_count[i][j]);
+            //std::cout << "\t" << static_cast<int>(s3_count[i][j]);
         }
-        std::cout << "\n----------------------------------------------------------------------------------\n";
+        //std::cout << "\n----------------------------------------------------------------------------------\n";
     }
     uint8_t max_S1 = GetMaxCount(s1_count);
     uint8_t max_S2 = GetMaxCount(s2_count);
@@ -340,7 +456,7 @@ int main()
     for (uint16_t num : numbers) {
         if (checkNumber(num, groups)) {
             valid_numbers_A.push_back(num);
-            std::cout << std::bitset<12>(num) << "\n";
+            std::cout << "delA " << std::bitset<12>(num) << "\n";
         }
     }
     std::vector<uint8_t> valid_numbers_C;
@@ -350,16 +466,111 @@ int main()
 
         uint8_t second_4_bits = (number >> 4) & 0x0F; 
         uint8_t third_4_bits = number & 0x0F;
-
-        std::cout << std::bitset<3>(GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1)) << "\n";
-        std::cout << std::bitset<3>(GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2)) << "\n";
-        std::cout << std::bitset<2>(GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3)) << "\n";
-
         uint8_t concatenated = (GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1) << 5) | (GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2) << 2) | GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3);
 
         valid_numbers_C.push_back(concatenated);
 
-        std::cout << std::bitset<8>(concatenated) << "\n";
+        std::cout << "delC " << std::bitset<8>(concatenated) << "\n";
     }
+    uint8_t delD = applyPermutation8(shuffleP8, valid_numbers_C[0]);
+    uint8_t delXR = computeDXR(shuffleP12, valid_numbers_A[0]);
+
+    std::cout << "----------------------\n";
+    std::cout << "Delta D " << std::bitset<8>(delD) << "\n";
+    std::cout << "Delta XR " << std::bitset<8>(delXR) << "\n\n";
+
+    // ------------------------------------------------- После получения delD
+
+
+    uint8_t R = 60;
+    uint8_t RS = 162;
+
+    uint8_t xR = expandByTable(R);
+    uint8_t xRS = expandByTable(RS);
+
+    std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
+    std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";
+
+    uint8_t delA1 = valid_numbers_A[0] >> 8 & 15;
+    uint8_t delA2 = valid_numbers_A[0] >> 4 & 15;
+    uint8_t delA3 = valid_numbers_A[0] & 15;
+        
+    std::cout << "delA1 " << std::bitset<4>(delA1) << std::endl;
+
+    // ------------------------------------------------- Получили вход два с дельта А1
+    std::vector<uint8_t> delA1Input2 = GetXorWithParameter(input1, delA1);
+    std::vector<uint8_t> delA2Input2 = GetXorWithParameter(input1, delA2);
+    std::vector<uint8_t> delA3Input2 = GetXorWithParameter(input1, delA3);
+
+    // Этот вход константа
+    std::vector<uint8_t> exit1DelConst = SBlockFirstSecondExit(input1, S1);
+
+    // Получили выход 2 для всего этого
+    std::vector<uint8_t> exit2DelA1 = SBlockFirstSecondExit(delA1Input2, S1);
+    std::vector<uint8_t> exit2DelA2 = SBlockFirstSecondExit(delA2Input2, S2);
+    std::vector<uint8_t> exit2DelA3 = SBlockThirdExit(delA3Input2, S3);
+
+    // Получаем дельта C
+    std::vector<uint8_t> delC1;
+    std::vector<uint8_t> delC2;
+    std::vector<uint8_t> delC3;
+    XorTwoTables(delC1, exit1DelConst, exit2DelA1);
+    XorTwoTables(delC2, exit1DelConst, exit2DelA2);
+    XorTwoTables(delC3, exit1DelConst, exit2DelA3); // !!!!!!!!!!!!!!!!!! ~~~~~~ три бита + два бита
+
+    // Делаем выборку из имеющегося C
+    uint8_t delC1Needed = (valid_numbers_C[0] >> 5) & 7;
+
+    // Получаем первые два столбика (вход1 и вход2) для deltaC1 
+    std::vector<uint8_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
+    std::vector<uint8_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
+
+    // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
+
+
+    std::vector<uint8_t> k11VariantsInp1 = GetXorWithParameterVector(c1NeededKeysExit1, (xR >> 8) & 15);
+    std::vector<uint8_t> k11VariantsInp2 = GetXorWithParameterVector(c1NeededKeysExit2, (xRS>>8)&15);
+
+    std::vector<uint8_t> k11Variants = GetSameValsVector(k11VariantsInp1, k11VariantsInp2);
+
+    // -------------------------- 2
+    uint8_t delC2Needed = (valid_numbers_C[0] >> 2) & 7;
+
+    // Получаем первые два столбика (вход1 и вход2) для deltaC2 
+    std::vector<uint8_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
+    std::vector<uint8_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
+
+    // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
+
+
+    std::vector<uint8_t> k12VariantsInp1 = GetXorWithParameterVector(c2NeededKeysExit1, (xR >> 4) & 15);
+    std::vector<uint8_t> k12VariantsInp2 = GetXorWithParameterVector(c2NeededKeysExit2, (xRS >> 4) & 15);
+
+    std::vector<uint8_t> k12Variants = GetSameValsVector(k12VariantsInp1, k12VariantsInp2);
+
+    // -------------------------- 3
+    uint8_t delC3Needed = valid_numbers_C[0] & 3;
+
+    // Получаем первые два столбика (вход1 и вход2) для deltaC2 
+    std::vector<uint8_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
+    std::vector<uint8_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
+
+    // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
+
+
+    std::vector<uint8_t> k13VariantsInp1 = GetXorWithParameterVector(c3NeededKeysExit1, xR & 15);
+    std::vector<uint8_t> k13VariantsInp2 = GetXorWithParameterVector(c3NeededKeysExit2, xRS & 15);
+
+    std::vector<uint8_t> k13Variants = GetSameValsVector(k13VariantsInp1, k13VariantsInp2);
+
+
+
+    std::vector<uint8_t> delC4;
+    //std::vector<uint8_t> delC3;
+
+    
+
+
+
     std::cout << "Hello World!\n";
 }

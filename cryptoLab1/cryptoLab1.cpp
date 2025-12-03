@@ -372,6 +372,22 @@ std::vector<uint8_t> GetSameValsVector(std::vector<uint8_t> a, std::vector<uint8
     return temp;
 }
 
+std::vector<uint8_t> GetKeyVariants(
+    const std::vector<uint8_t>& neededKeysExit1,
+    const std::vector<uint8_t>& neededKeysExit2,
+    uint32_t xR,
+    uint32_t xRS,
+    int shiftAmount)
+{
+    uint8_t param1 = (xR >> shiftAmount) & 15;
+    uint8_t param2 = (xRS >> shiftAmount) & 15;
+
+    std::vector<uint8_t> variantsInp1 = GetXorWithParameterVector(neededKeysExit1, param1);
+    std::vector<uint8_t> variantsInp2 = GetXorWithParameterVector(neededKeysExit2, param2);
+
+    return GetSameValsVector(variantsInp1, variantsInp2);
+}
+
 int main()
 {
     //std::cout << "S1";
@@ -481,16 +497,6 @@ int main()
 
     // ------------------------------------------------- После получения delD
 
-
-    uint8_t R = 60;
-    uint8_t RS = 162;
-
-    uint8_t xR = expandByTable(R);
-    uint8_t xRS = expandByTable(RS);
-
-    std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
-    std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";
-
     uint8_t delA1 = valid_numbers_A[0] >> 8 & 15;
     uint8_t delA2 = valid_numbers_A[0] >> 4 & 15;
     uint8_t delA3 = valid_numbers_A[0] & 15;
@@ -528,10 +534,7 @@ int main()
     // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
 
 
-    std::vector<uint8_t> k11VariantsInp1 = GetXorWithParameterVector(c1NeededKeysExit1, (xR >> 8) & 15);
-    std::vector<uint8_t> k11VariantsInp2 = GetXorWithParameterVector(c1NeededKeysExit2, (xRS>>8)&15);
-
-    std::vector<uint8_t> k11Variants = GetSameValsVector(k11VariantsInp1, k11VariantsInp2);
+    
 
     // -------------------------- 2
     uint8_t delC2Needed = (valid_numbers_C[0] >> 2) & 7;
@@ -543,10 +546,7 @@ int main()
     // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
 
 
-    std::vector<uint8_t> k12VariantsInp1 = GetXorWithParameterVector(c2NeededKeysExit1, (xR >> 4) & 15);
-    std::vector<uint8_t> k12VariantsInp2 = GetXorWithParameterVector(c2NeededKeysExit2, (xRS >> 4) & 15);
-
-    std::vector<uint8_t> k12Variants = GetSameValsVector(k12VariantsInp1, k12VariantsInp2);
+    
 
     // -------------------------- 3
     uint8_t delC3Needed = valid_numbers_C[0] & 3;
@@ -555,17 +555,60 @@ int main()
     std::vector<uint8_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
     std::vector<uint8_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
 
-    // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
+    // Считаем xr/s
+    /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
+    std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";*/
+    
+    std::vector<std::pair<uint8_t, uint8_t>> pairs = {
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    };
 
+    // Создаем таблицу статистики: 3 столбца (для K11, K12, K13), в каждом 16 счетчиков (0-15)
+    // Инициализируем нулями
+    std::vector<std::vector<int>> key_statistic(3, std::vector<int>(16, 0));
 
-    std::vector<uint8_t> k13VariantsInp1 = GetXorWithParameterVector(c3NeededKeysExit1, xR & 15);
-    std::vector<uint8_t> k13VariantsInp2 = GetXorWithParameterVector(c3NeededKeysExit2, xRS & 15);
+    for (const auto& pair : pairs) {
+        uint8_t R = pair.first;
+        uint8_t Rs = pair.second;
 
-    std::vector<uint8_t> k13Variants = GetSameValsVector(k13VariantsInp1, k13VariantsInp2);
+        uint8_t xR = expandByTable(R);
+        uint8_t xRS = expandByTable(Rs);
 
+        std::vector<uint8_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, xR, xRS, 8);
+        std::vector<uint8_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, xR, xRS, 4);
+        std::vector<uint8_t> k13Variants = GetKeyVariants(c3NeededKeysExit1, c3NeededKeysExit2, xR, xRS, 0);
+        for (uint8_t value : k11Variants) {
+            if (value < 16) {
+                key_statistic[0][value]++;
+            }
+        }
 
+        for (uint8_t value : k12Variants) {
+            if (value < 16) {
+                key_statistic[1][value]++;
+            }
+        }
+        for (uint8_t value : k13Variants) {
+            if (value < 16) {
+                key_statistic[2][value]++;
+            }
+        }
+    }
 
-    std::vector<uint8_t> delC4;
+    std::cout << "Val\t\tk11\tk12\tk13" << std::endl;
+    for (int value = 0; value < 16; ++value) {
+        std::cout << std::bitset<4>(value) << "\t\t";
+        std::cout << key_statistic[0][value] << "\t"
+            << key_statistic[1][value] << "\t"
+            << key_statistic[2][value] << std::endl;
+    }
     //std::vector<uint8_t> delC3;
 
     

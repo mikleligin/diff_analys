@@ -302,12 +302,17 @@ uint8_t applyPermutation8(const std::vector<uint8_t>& P, uint8_t x)
 uint16_t expandByTable(uint8_t input) {
     uint16_t result = 0;
 
-    for (size_t i = 0; i < shuffleP12.size(); i++) {
-        uint8_t bitIndex = shuffleP12[i];
-        uint8_t bit = (input >> (8 - bitIndex)) & 1;
+    // 2,8,3,5,1,6,7,4,2,5,8,1
+     //1 0 0 0 0 0 0 0 0 0 0 0
+    // 01001011
 
-        result <<= 1;
-        result |= bit;
+    // 1
+
+    for (size_t i = 0; i < shuffleP12.size(); i++) {
+        int shift = 8 - shuffleP12[i];
+        uint8_t temp = (input >> shift) & 1;
+        
+        result |= (temp << (11 - i));
     }
 
     return result;
@@ -510,6 +515,8 @@ int main()
 
     // Этот вход константа
     std::vector<uint8_t> exit1DelConst = SBlockFirstSecondExit(input1, S1);
+    std::vector<uint8_t> exit1DelConst2 = SBlockFirstSecondExit(input1, S2);
+    std::vector<uint8_t> exit1DelConst3 = SBlockThirdExit(input1, S3);
 
     // Получили выход 2 для всего этого
     std::vector<uint8_t> exit2DelA1 = SBlockFirstSecondExit(delA1Input2, S1);
@@ -521,8 +528,8 @@ int main()
     std::vector<uint8_t> delC2;
     std::vector<uint8_t> delC3;
     XorTwoTables(delC1, exit1DelConst, exit2DelA1);
-    XorTwoTables(delC2, exit1DelConst, exit2DelA2);
-    XorTwoTables(delC3, exit1DelConst, exit2DelA3); // !!!!!!!!!!!!!!!!!! ~~~~~~ три бита + два бита
+    XorTwoTables(delC2, exit1DelConst2, exit2DelA2);
+    XorTwoTables(delC3, exit1DelConst3, exit2DelA3); // !!!!!!!!!!!!!!!!!! ~~~~~~ три бита + два бита
 
     // Делаем выборку из имеющегося C
     uint8_t delC1Needed = (valid_numbers_C[0] >> 5) & 7;
@@ -560,15 +567,35 @@ int main()
     std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";*/
     
     std::vector<std::pair<uint8_t, uint8_t>> pairs = {
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
-    {0b00111100, 0b10100010},
+
+        {0b01001011, 0b11010101},
+        {0b01011101, 0b11000011},
+        {0b11110111, 0b01101001},
+        {0b00101000, 0b10110110},
+        {0b00011111, 0b10000001},
+        {0b10011110, 0b00000000},
+        {0b00001000, 0b10010110},
+        {0b01010100, 0b11001010},
+        {0b10000010, 0b00011100},
+        {0b11101100, 0b01110010},
+        {0b01111111, 0b11100001},
+        {0b01001010, 0b11010100},
+        {0b11010110, 0b01001000},
+        {0b01000010, 0b11011100},
+        {0b01010101, 0b11001011},
     };
+
+
+
+    /*{0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    {0b00111100, 0b10100010},
+    };*/
 
     // Создаем таблицу статистики: 3 столбца (для K11, K12, K13), в каждом 16 счетчиков (0-15)
     // Инициализируем нулями
@@ -578,9 +605,10 @@ int main()
         uint8_t R = pair.first;
         uint8_t Rs = pair.second;
 
-        uint8_t xR = expandByTable(R);
-        uint8_t xRS = expandByTable(Rs);
-
+        uint16_t xR = expandByTable(R);
+        uint16_t xRS = expandByTable(Rs);
+        /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
+        std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(Rs) << "\n";*/
         std::vector<uint8_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, xR, xRS, 8);
         std::vector<uint8_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, xR, xRS, 4);
         std::vector<uint8_t> k13Variants = GetKeyVariants(c3NeededKeysExit1, c3NeededKeysExit2, xR, xRS, 0);
@@ -595,6 +623,7 @@ int main()
                 key_statistic[1][value]++;
             }
         }
+
         for (uint8_t value : k13Variants) {
             if (value < 16) {
                 key_statistic[2][value]++;

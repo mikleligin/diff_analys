@@ -22,7 +22,5 @@ D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(190,45): warning C4267: аргуме
               _Ty=uint8_t
           ]
 D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(254,43): warning C4267: =: преобразование из "size_t" в "uint8_t"; возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(479,42): warning C4244: инициализация: преобразование "unsigned short" в "uint8_t", возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(581,20): warning C4244: инициализация: преобразование "uint16_t" в "uint8_t", возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(582,21): warning C4244: инициализация: преобразование "uint16_t" в "uint8_t", возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(484,42): warning C4244: инициализация: преобразование "unsigned short" в "uint8_t", возможна потеря данных
   cryptoLab1.vcxproj -> D:\dev\cryptoLab1\x64\Debug\cryptoLab1.exe

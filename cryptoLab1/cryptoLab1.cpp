@@ -9,34 +9,34 @@
 #define exit1 15
 #define exit3 3
 #define DAi 15
-#define int8 uint8_t
+#define int8 uint16_t
 #define int16 uint16_t
 
 
-std::vector<std::vector<uint8_t>> S1 = { 
-    {1,5,2,6,2,6,7,3},
-    {5,3,7,1,4,0,0,4}
+std::vector<std::vector<uint16_t>> S1 = { 
+    {1,6,3,7,5,1,0,7},
+    {0,2,2,5,3,4,6,4}
 };
-std::vector<std::vector<uint8_t>> S2 = {
-    {3,2,5,5,3,6,0,6},
-    {1,7,1,4,0,2,7,4}
+std::vector<std::vector<uint16_t>> S2 = {
+    {4,5,1,1,0,7,5,3},
+    {4,3,0,7,2,6,6,2}
 };
-std::vector<std::vector<uint8_t>> S3 = {
+std::vector<std::vector<uint16_t>> S3 = {
     {3,2,2,1},
     {2,0,2,3},
     {1,0,3,1},
     {3,0,0,1}
 };
 
-std::vector<uint8_t > shuffleP8 = {4,7,5,3,6,8,2,1};
-std::vector<uint8_t > shuffleP12 = {2,8,3,5,1,6,7,4,2,5,8,1};
+std::vector<uint16_t > shuffleP8 = { 1,2,5,4,6,3,8,7 };
+std::vector<uint16_t > shuffleP12 = { 2,8,4,1,7,3,6,5,8,2,1,4 };
 
-std::vector<uint8_t> SBlockFirstSecondExit(std::vector<uint8_t> input1, std::vector<std::vector<uint8_t>> S) {
-    std::vector<uint8_t> z;
+std::vector<uint16_t> SBlockFirstSecondExit(std::vector<uint16_t> input1, std::vector<std::vector<uint16_t>> S) {
+    std::vector<uint16_t> z;
     int i = 0;
     while (i<=15)
     {
-        uint8_t x = input1[i] >> 3;
+        uint16_t x = input1[i] >> 3;
         std::bitset<4> bitI(input1[i]);
         std::bitset<3> res(S[x][input1[i] & 7]);
         //std::cout << "\tres:" << bitI << "<->" << res << std::endl;
@@ -46,13 +46,13 @@ std::vector<uint8_t> SBlockFirstSecondExit(std::vector<uint8_t> input1, std::vec
     return z;
 }
 
-std::vector<uint8_t> SBlockThirdExit(std::vector<uint8_t> input1, std::vector<std::vector<uint8_t>> S) {
-    std::vector<uint8_t> z;
+std::vector<uint16_t> SBlockThirdExit(std::vector<uint16_t> input1, std::vector<std::vector<uint16_t>> S) {
+    std::vector<uint16_t> z;
     int i = 0;
     while (i <= 15)
     {
-        uint8_t a1a4 = (input1[i] >> 2) & 2 | (input1[i] & 1) & 3;
-        uint8_t a2a3 = (input1[i] >> 1) & 3;
+        uint16_t a1a4 = (input1[i] >> 2) & 2 | (input1[i] & 1) & 3;
+        uint16_t a2a3 = (input1[i] >> 1) & 3;
         std::bitset<3> res(S3[a1a4][a2a3]);
         std::bitset<4> bitI(input1[i]);
         //std::cout << "\t third " << bitI << " " << res << "\n";
@@ -64,8 +64,8 @@ std::vector<uint8_t> SBlockThirdExit(std::vector<uint8_t> input1, std::vector<st
 
 
 
-std::vector<uint8_t> DifXor(uint8_t input_dif, std::vector<std::vector<uint8_t>> S) {
-    std::vector<uint8_t> exit_2;
+std::vector<uint16_t> DifXor(uint16_t input_dif, std::vector<std::vector<uint16_t>> S) {
+    std::vector<uint16_t> exit_2;
     for (size_t i = 0; i <= exit1; i++)
     {
         exit_2.push_back(input_dif ^ i);
@@ -74,8 +74,8 @@ std::vector<uint8_t> DifXor(uint8_t input_dif, std::vector<std::vector<uint8_t>>
     return SBlockFirstSecondExit(exit_2, S);
 }
 
-std::vector<uint8_t> DifXorS3(uint8_t input_dif, std::vector<std::vector<uint8_t>> S) {
-    std::vector<uint8_t> exit_2;
+std::vector<uint16_t> DifXorS3(uint16_t input_dif, std::vector<std::vector<uint16_t>> S) {
+    std::vector<uint16_t> exit_2;
     for (size_t i = 0; i <= exit1; i++)
     {
         exit_2.push_back(input_dif ^ i);
@@ -84,11 +84,11 @@ std::vector<uint8_t> DifXorS3(uint8_t input_dif, std::vector<std::vector<uint8_t
     return SBlockThirdExit(exit_2, S);
 }
 
-std::vector<std::vector<uint8_t>> GetInitCounterVector() {
-    std::vector<std::vector<uint8_t>> input_vector;
+std::vector<std::vector<uint16_t>> GetInitCounterVector() {
+    std::vector<std::vector<uint16_t>> input_vector;
     for (size_t i = 0; i <= 15; i++)
     {
-        std::vector<uint8_t> str;
+        std::vector<uint16_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
             str.push_back(0);
@@ -97,42 +97,42 @@ std::vector<std::vector<uint8_t>> GetInitCounterVector() {
     }
     return input_vector;
 }
-std::vector<std::vector<uint8_t>> SblockCounterOfArray(std::vector<std::vector<uint8_t>> input_array, std::vector<std::vector<uint8_t>> sblock_arrays) {
+std::vector<std::vector<uint16_t>> SblockCounterOfArray(std::vector<std::vector<uint16_t>> input_array, std::vector<std::vector<uint16_t>> sblock_arrays) {
     
     // i = 0 j = 1
     // 0 0 1 3 0 2    0 0 0 0 0 0 
     // 1 1 0 0 0 2
     int counter = 0;
-    std::vector<std::vector<uint8_t>> z = input_array;
+    std::vector<std::vector<uint16_t>> z = input_array;
     for (size_t table = 0; table <= 15; table++) {
         for (size_t pos = 0; pos <= 15; pos++) {
-            uint8_t digit = sblock_arrays[table][pos];
+            uint16_t digit = sblock_arrays[table][pos];
             z[table][digit]++;
         }
     }
     return z;
 }
-std::vector<std::vector<uint8_t>> SblockCounterOfArrayS3(std::vector<std::vector<uint8_t>> input_array, std::vector<std::vector<uint8_t>> sblock_arrays) {
+std::vector<std::vector<uint16_t>> SblockCounterOfArrayS3(std::vector<std::vector<uint16_t>> input_array, std::vector<std::vector<uint16_t>> sblock_arrays) {
 
     // i = 0 j = 1
     // 0 0 1 3 0 2    0 0 0 0 0 0 
     // 1 1 0 0 0 2
     int counter = 0;
-    std::vector<std::vector<uint8_t>> z = input_array;
+    std::vector<std::vector<uint16_t>> z = input_array;
     for (size_t table = 0; table <= 15; table++) {
         for (size_t pos = 0; pos <= 7; pos++) {
-            uint8_t digit = sblock_arrays[table][pos];
+            uint16_t digit = sblock_arrays[table][pos];
             z[table][digit]++;
         }
     }
     return z;
 }
 
-void GetHexHexXorS1S2(std::vector<std::vector<uint8_t>> &output, std::vector<uint8_t> s_block_out, std::vector<std::vector<uint8_t>> S) {
+void GetHexHexXorS1S2(std::vector<std::vector<uint16_t>> &output, std::vector<uint16_t> s_block_out, std::vector<std::vector<uint16_t>> S) {
     for (size_t i = 0; i <= DAi; i++)
     {
-        std::vector<uint8_t> temp;
-        std::vector<uint8_t> dci = DifXor(i, S);
+        std::vector<uint16_t> temp;
+        std::vector<uint16_t> dci = DifXor(i, S);
         //std::cout << "\n\n";
         for (size_t j = 0; j < dci.size(); j++)
         {
@@ -145,11 +145,11 @@ void GetHexHexXorS1S2(std::vector<std::vector<uint8_t>> &output, std::vector<uin
         output.push_back(temp);
     }
 }
-void GetHexHexXorS3(std::vector<std::vector<uint8_t>>& output, std::vector<uint8_t> s_block_out, std::vector<std::vector<uint8_t>> S) {
+void GetHexHexXorS3(std::vector<std::vector<uint16_t>>& output, std::vector<uint16_t> s_block_out, std::vector<std::vector<uint16_t>> S) {
     for (size_t i = 0; i <= DAi; i++)
     {
-        std::vector<uint8_t> temp;
-        std::vector<uint8_t> dci = DifXorS3(i, S);
+        std::vector<uint16_t> temp;
+        std::vector<uint16_t> dci = DifXorS3(i, S);
         //std::cout << "\n\n";
         for (size_t j = 0; j < dci.size(); j++)
         {
@@ -165,8 +165,8 @@ void GetHexHexXorS3(std::vector<std::vector<uint8_t>>& output, std::vector<uint8
 
 
 // Считаем вероятности
-uint8_t GetMaxCount(std::vector<std::vector<uint8_t>> table) {
-    uint8_t max = 0;
+uint16_t GetMaxCount(std::vector<std::vector<uint16_t>> table) {
+    uint16_t max = 0;
     for (size_t i = 1; i < table.size(); i++)
     {
         for (size_t j = 0; j < table[i].size(); j++)
@@ -181,8 +181,8 @@ uint8_t GetMaxCount(std::vector<std::vector<uint8_t>> table) {
 }
 
 // Берем кусок от DA
-std::vector<uint8_t> GetDiffAnalys(std::vector<std::vector<uint8_t>> table, uint8_t num, std::string row) {
-    std::vector<uint8_t> analys_array;
+std::vector<uint16_t> GetDiffAnalys(std::vector<std::vector<uint16_t>> table, uint16_t num, std::string row) {
+    std::vector<uint16_t> analys_array;
     for (size_t i = 1; i < table.size(); i++)
     {
         for (size_t j = 0; j < table[i].size(); j++)
@@ -204,8 +204,8 @@ std::vector<uint8_t> GetDiffAnalys(std::vector<std::vector<uint8_t>> table, uint
 }
 
 // Найти повторяющиеся приколы в массиве
-std::vector<std::vector<int>> findIdenticalGroups(const std::vector<uint8_t>& table) {
-    std::map<uint8_t, std::vector<int>> groups;
+std::vector<std::vector<int>> findIdenticalGroups(const std::vector<uint16_t>& table) {
+    std::map<uint16_t, std::vector<int>> groups;
 
     for (int i = 0; i < table.size(); i++) {
         groups[table[i]].push_back(i);
@@ -253,8 +253,8 @@ bool checkNumberAlt(uint16_t num, const std::vector<std::vector<int>>& groups) {
 }
 
 // Получаем DC
-uint8_t GetCByMaxAndPieceOfA(std::vector<std::vector<uint8_t>> table, uint8_t piece, uint8_t max) {
-    uint8_t x = 0;
+uint16_t GetCByMaxAndPieceOfA(std::vector<std::vector<uint16_t>> table, uint16_t piece, uint16_t max) {
+    uint16_t x = 0;
     for (size_t i = 0; i <= piece; i++)
     {
         for (size_t j = 0; j < table[i].size(); j++)
@@ -264,50 +264,50 @@ uint8_t GetCByMaxAndPieceOfA(std::vector<std::vector<uint8_t>> table, uint8_t pi
     }
     return x;
 }
-uint8_t applyP12(uint16_t in12)
+uint16_t applyP12(uint16_t in12)
 {
-    uint8_t out = 0;
+    uint16_t out = 0;
     for (int i = 0; i < 8; i++)
     {
-        uint8_t bit = (in12 >> (12 - shuffleP12[i])) & 1;
+        uint16_t bit = (in12 >> (12 - shuffleP12[i])) & 1;
         out |= bit << (7 - i);
     }
     std::cout << std::bitset<8>(out) << std::endl;
     return out;
 }
 
-uint8_t computeDXR(const std::vector<uint8_t>& P12, uint16_t DA)
+uint16_t computeDXR(const std::vector<uint16_t>& P12, uint16_t DA)
 {
-    uint8_t invP[8] = { 0 };
+    uint16_t invP[8] = { 0 };
     for (int i = 0; i < 8; i++)
     {
-        uint8_t outPos = i + 1;
-        uint8_t inPos = P12[i];
+        uint16_t outPos = i + 1;
+        uint16_t inPos = P12[i];
         invP[inPos - 1] = outPos;
     }
 
-    uint8_t DXR = 0;
+    uint16_t DXR = 0;
     for (int i = 0; i < 8; i++)
     {
-        uint8_t srcBit = invP[i];
-        uint8_t bit = (DA >> (12 - srcBit)) & 1;
+        uint16_t srcBit = invP[i];
+        uint16_t bit = (DA >> (12 - srcBit)) & 1;
         DXR |= bit << (7 - i);
     }
 
     return DXR;
 }
-uint8_t applyPermutation8(const std::vector<uint8_t>& P, uint8_t x)
+uint16_t applyPermutation8(const std::vector<uint16_t>& P, uint16_t x)
 {
-    uint8_t out = 0;
+    uint16_t out = 0;
     for (int i = 0; i < 8; i++)
     {
-        uint8_t bit = (x >> (8 - P[i])) & 1;
+        uint16_t bit = (x >> (8 - P[i])) & 1;
         out |= bit << (7 - i);
     }
     return out;
 }
 
-uint16_t expandByTable(uint8_t input) {
+uint16_t expandByTable(uint16_t input) {
     uint16_t result = 0;
 
     // 2,8,3,5,1,6,7,4,2,5,8,1
@@ -318,7 +318,7 @@ uint16_t expandByTable(uint8_t input) {
 
     for (size_t i = 0; i < shuffleP12.size(); i++) {
         int shift = 8 - shuffleP12[i];
-        uint8_t temp = (input >> shift) & 1;
+        uint16_t temp = (input >> shift) & 1;
         
         result |= (temp << (11 - i));
     }
@@ -327,37 +327,37 @@ uint16_t expandByTable(uint8_t input) {
 }
 
 
-std::vector<uint8_t> GetXorWithParameter(std::vector<uint8_t> s_block_out, uint8_t diff) {
-    std::vector<uint8_t> output;
+std::vector<uint16_t> GetXorWithParameter(std::vector<uint16_t> s_block_out, uint16_t diff) {
+    std::vector<uint16_t> output;
     for (size_t i = 0; i <= DAi; i++)
     {
-        uint8_t temp = s_block_out[i] ^ diff;
+        uint16_t temp = s_block_out[i] ^ diff;
         output.push_back(temp);
     }
     return output;
 }
 
-std::vector<uint8_t> GetXorWithParameterVector(std::vector<uint8_t> s_block_out, uint8_t diff) {
-    std::vector<uint8_t> output;
+std::vector<uint16_t> GetXorWithParameterVector(std::vector<uint16_t> s_block_out, uint16_t diff) {
+    std::vector<uint16_t> output;
     for (size_t i = 0; i < s_block_out.size(); i++)
     {
-        uint8_t temp = s_block_out[i] ^ diff;
+        uint16_t temp = s_block_out[i] ^ diff;
         output.push_back(temp);
     }
     return output;
 }
 
-void XorTwoTables(std::vector<uint8_t> &out, std::vector<uint8_t> first, std::vector<uint8_t> second) {
-    std::vector<uint8_t> output;
+void XorTwoTables(std::vector<uint16_t> &out, std::vector<uint16_t> first, std::vector<uint16_t> second) {
+    std::vector<uint16_t> output;
     for (size_t i = 0; i < first.size(); i++)
     {
-        uint8_t temp = first[i] ^ second[i];
+        uint16_t temp = first[i] ^ second[i];
         out.push_back(temp);
     }
 }
 
-std::vector<uint8_t> getRightCOutputs(std::vector<uint8_t> input_array, std::vector<uint8_t> input_c_row, uint8_t c) {
-    std::vector<uint8_t> temp;
+std::vector<uint16_t> getRightCOutputs(std::vector<uint16_t> input_array, std::vector<uint16_t> input_c_row, uint16_t c) {
+    std::vector<uint16_t> temp;
     for (size_t i = 0; i < input_c_row.size(); i++)
     {
         if (input_c_row[i] == c)
@@ -369,9 +369,9 @@ std::vector<uint8_t> getRightCOutputs(std::vector<uint8_t> input_array, std::vec
     return temp;
 }
 
-std::vector<uint8_t> GetSameValsVector(std::vector<uint8_t> a, std::vector<uint8_t> b)
+std::vector<uint16_t> GetSameValsVector(std::vector<uint16_t> a, std::vector<uint16_t> b)
 {
-    std::vector<uint8_t> temp;
+    std::vector<uint16_t> temp;
     for (size_t i = 0; i < a.size(); i++)
     {
         for (size_t j = 0; j < b.size(); j++)
@@ -385,37 +385,37 @@ std::vector<uint8_t> GetSameValsVector(std::vector<uint8_t> a, std::vector<uint8
     return temp;
 }
 
-std::vector<uint8_t> GetKeyVariants(
-    const std::vector<uint8_t>& neededKeysExit1,
-    const std::vector<uint8_t>& neededKeysExit2,
+std::vector<uint16_t> GetKeyVariants(
+    const std::vector<uint16_t>& neededKeysExit1,
+    const std::vector<uint16_t>& neededKeysExit2,
     uint32_t xR,
     uint32_t xRS,
     int shiftAmount)
 {
-    uint8_t param1 = (xR >> shiftAmount) & 15;
-    uint8_t param2 = (xRS >> shiftAmount) & 15;
+    uint16_t param1 = (xR >> shiftAmount) & 15;
+    uint16_t param2 = (xRS >> shiftAmount) & 15;
 
-    std::vector<uint8_t> variantsInp1 = GetXorWithParameterVector(neededKeysExit1, param1);
-    std::vector<uint8_t> variantsInp2 = GetXorWithParameterVector(neededKeysExit2, param2);
+    std::vector<uint16_t> variantsInp1 = GetXorWithParameterVector(neededKeysExit1, param1);
+    std::vector<uint16_t> variantsInp2 = GetXorWithParameterVector(neededKeysExit2, param2);
 
     return GetSameValsVector(variantsInp1, variantsInp2);
 }
 
-uint8_t applyInversePermutation8(const std::vector<uint8_t>& P, uint8_t x)
+uint16_t applyInversePermutation8(const std::vector<uint16_t>& P, uint16_t x)
 {
-    std::vector<uint8_t> P_inv(8);
+    std::vector<uint16_t> P_inv(8);
     for (int i = 0; i < 8; i++) {
         P_inv[P[i] - 1] = i + 1;
     }
-    uint8_t out = 0;
+    uint16_t out = 0;
     for (int i = 0; i < 8; i++) {
-        uint8_t bit = (x >> (8 - P_inv[i])) & 1;
+        uint16_t bit = (x >> (8 - P_inv[i])) & 1;
         out |= bit << (7 - i);
     }
     return out;
 }
-uint8_t getMaxFromLine(std::vector<uint8_t> line) {
-    uint8_t max = 0;
+uint16_t getMaxFromLine(std::vector<uint16_t> line) {
+    uint16_t max = 0;
     for (size_t i = 0; i < line.size(); i++)
     {
         max = line[i] > max ? line[i] : max;
@@ -423,8 +423,8 @@ uint8_t getMaxFromLine(std::vector<uint8_t> line) {
     return max;
 }
 
-std::vector<uint8_t> getRowsFromLineVectorByMaxCount(std::vector<std::vector<uint8_t>> S, int8 line, int8 max) {
-    std::vector<uint8_t> row;
+std::vector<uint16_t> getRowsFromLineVectorByMaxCount(std::vector<std::vector<uint16_t>> S, int8 line, int8 max) {
+    std::vector<uint16_t> row;
     for (size_t i = 0; i < S[line].size(); i++)
     {
         if (S[line][i] == max)
@@ -435,8 +435,8 @@ std::vector<uint8_t> getRowsFromLineVectorByMaxCount(std::vector<std::vector<uin
     return row;
 }
 
-uint8_t getRowByMaxCount(std::vector<std::vector<uint8_t>> S, int8 line, int8 max) {
-    uint8_t row = 0;
+uint16_t getRowByMaxCount(std::vector<std::vector<uint16_t>> S, int8 line, int8 max) {
+    uint16_t row = 0;
     for (size_t i = 0; i < S[line].size(); i++)
     {
         if (S[line][i] == max)
@@ -476,27 +476,27 @@ void GetKeyPossibles(std::vector<std::vector<int>> &key_statistic, int num) {
 int main()
 {
     //std::cout << "S1";
-    std::vector<uint8_t> input1 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-    std::vector<uint8_t> s1_out = SBlockFirstSecondExit(input1, S1);
+    std::vector<uint16_t> input1 = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    std::vector<uint16_t> s1_out = SBlockFirstSecondExit(input1, S1);
     //std::cout << "\nS2";
     //std::cout << "\n";
-    std::vector<uint8_t> s2_out = SBlockFirstSecondExit(input1, S2);
+    std::vector<uint16_t> s2_out = SBlockFirstSecondExit(input1, S2);
     //std::cout << "\nS3";
    // std::cout << "\n";
-    std::vector<uint8_t> s3_out = SBlockThirdExit(input1, S3);
-    std::vector<std::vector<uint8_t>> final_out_xor_s1;
-    std::vector<std::vector<uint8_t>> final_out_xor_s2;
-    std::vector<std::vector<uint8_t>> final_out_xor_s3;
+    std::vector<uint16_t> s3_out = SBlockThirdExit(input1, S3);
+    std::vector<std::vector<uint16_t>> final_out_xor_s1;
+    std::vector<std::vector<uint16_t>> final_out_xor_s2;
+    std::vector<std::vector<uint16_t>> final_out_xor_s3;
     GetHexHexXorS1S2(final_out_xor_s1, s1_out, S1);
     GetHexHexXorS1S2(final_out_xor_s2, s2_out, S2);
     GetHexHexXorS3(final_out_xor_s3, s3_out, S3);
-    std::vector<std::vector<uint8_t>> s1_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s1);
-    std::vector<std::vector<uint8_t>> s2_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s2);
-    std::vector<std::vector<uint8_t>> s3_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s3);
+    std::vector<std::vector<uint16_t>> s1_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s1);
+    std::vector<std::vector<uint16_t>> s2_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s2);
+    std::vector<std::vector<uint16_t>> s3_count = SblockCounterOfArray(GetInitCounterVector(), final_out_xor_s3);
     std::cout << "\n========================================1========================================\n\n\n";
     for (size_t i = 0; i <= 15; i++)
     {
-        std::vector<uint8_t> str;
+        std::vector<uint16_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
             //std::cout << "\t" << static_cast<int>(s1_count[i][j]);
@@ -506,7 +506,7 @@ int main()
     //std::cout << "\n========================================2========================================\n\n\n";
     for (size_t i = 0; i <= 15; i++)
     {
-        std::vector<uint8_t> str;
+        std::vector<uint16_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
             //std::cout << "\t" << static_cast<int>(s2_count[i][j]);
@@ -517,23 +517,23 @@ int main()
     
     for (size_t i = 0; i <= 15; i++)
     {
-        std::vector<uint8_t> str;
+        std::vector<uint16_t> str;
         for (size_t j = 0; j <= 7; j++)
         {
             //std::cout << "\t" << static_cast<int>(s3_count[i][j]);
         }
         //std::cout << "\n----------------------------------------------------------------------------------\n";
     }
-    uint8_t max_S1 = GetMaxCount(s1_count);
-    uint8_t max_S2 = GetMaxCount(s2_count);
-    uint8_t max_S3 = GetMaxCount(s3_count);
+    uint16_t max_S1 = GetMaxCount(s1_count);
+    uint16_t max_S2 = GetMaxCount(s2_count);
+    uint16_t max_S3 = GetMaxCount(s3_count);
 
-    std::vector<uint8_t> diff_s1 = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "A");
-    std::vector<uint8_t> diff_s2 = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "A");
-    std::vector<uint8_t> diff_s3 = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "A");
-    std::vector<uint8_t> diff_s1_с = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "C");
-    std::vector<uint8_t> diff_s2_с = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "C");
-    std::vector<uint8_t> diff_s3_с = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "C");
+    std::vector<uint16_t> diff_s1 = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "A");
+    std::vector<uint16_t> diff_s2 = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "A");
+    std::vector<uint16_t> diff_s3 = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "A");
+    std::vector<uint16_t> diff_s1_с = GetDiffAnalys(s1_count, GetMaxCount(s1_count), "C");
+    std::vector<uint16_t> diff_s2_с = GetDiffAnalys(s2_count, GetMaxCount(s2_count), "C");
+    std::vector<uint16_t> diff_s3_с = GetDiffAnalys(s3_count, GetMaxCount(s3_count), "C");
 
 
     std::cout << "SADFWEJRHWJERWER    " << static_cast<int>(diff_s2_с[0]) << "\n";
@@ -560,21 +560,21 @@ int main()
             std::cout << "delA " << std::bitset<12>(num) << "\n";
         }
     }
-    std::vector<uint8_t> valid_numbers_C;
-    for (uint8_t number : valid_numbers_A)
+    std::vector<uint16_t> valid_numbers_C;
+    for (uint16_t number : valid_numbers_A)
     {
-        uint8_t first_4_bits = (number >> 7) & 0x0F;
+        uint16_t first_4_bits = (number >> 7) & 0x0F;
 
-        uint8_t second_4_bits = (number >> 4) & 0x0F; 
-        uint8_t third_4_bits = number & 0x0F;
-        uint8_t concatenated = (GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1) << 5) | (GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2) << 2) | GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3);
+        uint16_t second_4_bits = (number >> 4) & 0x0F; 
+        uint16_t third_4_bits = number & 0x0F;
+        uint16_t concatenated = (GetCByMaxAndPieceOfA(s1_count, first_4_bits, max_S1) << 5) | (GetCByMaxAndPieceOfA(s2_count, second_4_bits, max_S2) << 2) | GetCByMaxAndPieceOfA(s3_count, third_4_bits, max_S3);
 
         valid_numbers_C.push_back(concatenated);
 
         std::cout << "delC " << std::bitset<8>(concatenated) << "\n";
     }
-    uint8_t delD = applyPermutation8(shuffleP8, valid_numbers_C[0]);
-    uint8_t delXR = computeDXR(shuffleP12, valid_numbers_A[0]);
+    uint16_t delD = applyPermutation8(shuffleP8, valid_numbers_C[0]);
+    uint16_t delXR = computeDXR(shuffleP12, valid_numbers_A[0]);
 
     std::cout << "----------------------\n";
     std::cout << "Delta D " << std::bitset<8>(delD) << "\n";
@@ -582,41 +582,41 @@ int main()
 
     // ------------------------------------------------- После получения delD
 
-    uint8_t delA1 = valid_numbers_A[0] >> 8 & 15;
-    uint8_t delA2 = valid_numbers_A[0] >> 4 & 15;
-    uint8_t delA3 = valid_numbers_A[0] & 15;
+    uint16_t delA1 = valid_numbers_A[0] >> 8 & 15;
+    uint16_t delA2 = valid_numbers_A[0] >> 4 & 15;
+    uint16_t delA3 = valid_numbers_A[0] & 15;
         
     std::cout << "delA1 " << std::bitset<4>(delA1) << std::endl;
 
     // ------------------------------------------------- Получили вход два с дельта А1
-    std::vector<uint8_t> delA1Input2 = GetXorWithParameter(input1, delA1);
-    std::vector<uint8_t> delA2Input2 = GetXorWithParameter(input1, delA2);
-    std::vector<uint8_t> delA3Input2 = GetXorWithParameter(input1, delA3);
+    std::vector<uint16_t> delA1Input2 = GetXorWithParameter(input1, delA1);
+    std::vector<uint16_t> delA2Input2 = GetXorWithParameter(input1, delA2);
+    std::vector<uint16_t> delA3Input2 = GetXorWithParameter(input1, delA3);
 
     // Этот вход константа
-    std::vector<uint8_t> exit1DelConst = SBlockFirstSecondExit(input1, S1);
-    std::vector<uint8_t> exit1DelConst2 = SBlockFirstSecondExit(input1, S2);
-    std::vector<uint8_t> exit1DelConst3 = SBlockThirdExit(input1, S3);
+    std::vector<uint16_t> exit1DelConst = SBlockFirstSecondExit(input1, S1);
+    std::vector<uint16_t> exit1DelConst2 = SBlockFirstSecondExit(input1, S2);
+    std::vector<uint16_t> exit1DelConst3 = SBlockThirdExit(input1, S3);
 
     // Получили выход 2 для всего этого
-    std::vector<uint8_t> exit2DelA1 = SBlockFirstSecondExit(delA1Input2, S1);
-    std::vector<uint8_t> exit2DelA2 = SBlockFirstSecondExit(delA2Input2, S2);
-    std::vector<uint8_t> exit2DelA3 = SBlockThirdExit(delA3Input2, S3);
+    std::vector<uint16_t> exit2DelA1 = SBlockFirstSecondExit(delA1Input2, S1);
+    std::vector<uint16_t> exit2DelA2 = SBlockFirstSecondExit(delA2Input2, S2);
+    std::vector<uint16_t> exit2DelA3 = SBlockThirdExit(delA3Input2, S3);
 
     // Получаем дельта C
-    std::vector<uint8_t> delC1;
-    std::vector<uint8_t> delC2;
-    std::vector<uint8_t> delC3;
+    std::vector<uint16_t> delC1;
+    std::vector<uint16_t> delC2;
+    std::vector<uint16_t> delC3;
     XorTwoTables(delC1, exit1DelConst, exit2DelA1);
     XorTwoTables(delC2, exit1DelConst2, exit2DelA2);
     XorTwoTables(delC3, exit1DelConst3, exit2DelA3); // !!!!!!!!!!!!!!!!!! ~~~~~~ три бита + два бита
 
     // Делаем выборку из имеющегося C
-    uint8_t delC1Needed = (valid_numbers_C[0] >> 5) & 7;
+    uint16_t delC1Needed = (valid_numbers_C[0] >> 5) & 7;
 
     // Получаем первые два столбика (вход1 и вход2) для deltaC1 
-    std::vector<uint8_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
-    std::vector<uint8_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
+    std::vector<uint16_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
+    std::vector<uint16_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
 
     // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
 
@@ -624,11 +624,11 @@ int main()
     
 
     // -------------------------- 2
-    uint8_t delC2Needed = (valid_numbers_C[0] >> 2) & 7;
+    uint16_t delC2Needed = (valid_numbers_C[0] >> 2) & 7;
 
     // Получаем первые два столбика (вход1 и вход2) для deltaC2 
-    std::vector<uint8_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
-    std::vector<uint8_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
+    std::vector<uint16_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
+    std::vector<uint16_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
 
     // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
 
@@ -636,11 +636,11 @@ int main()
     
 
     // -------------------------- 3
-    uint8_t delC3Needed = valid_numbers_C[0] & 3;
+    uint16_t delC3Needed = valid_numbers_C[0] & 3;
 
     // Получаем первые два столбика (вход1 и вход2) для deltaC2 
-    std::vector<uint8_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
-    std::vector<uint8_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
+    std::vector<uint16_t> c3NeededKeysExit1 = getRightCOutputs(input1, delC3, delC3Needed);
+    std::vector<uint16_t> c3NeededKeysExit2 = getRightCOutputs(delA3Input2, delC3, delC3Needed);
 
 
     // -------------------------------------------------------------------------------------------------------- Подбор
@@ -649,23 +649,37 @@ int main()
     /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
     std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";*/
     
-    std::vector<std::pair<uint8_t, uint8_t>> pairs = {
+    std::vector<std::pair<uint16_t, uint16_t>> pairs = {
 
-        {0b01001011, 0b11010101},
-        {0b01011101, 0b11000011},
-        {0b11110111, 0b01101001},
-        {0b00101000, 0b10110110},
-        {0b00011111, 0b10000001},
-        {0b10011110, 0b00000000},
-        {0b00001000, 0b10010110},
-        {0b01010100, 0b11001010},
-        {0b10000010, 0b00011100},
-        {0b11101100, 0b01110010},
-        {0b01111111, 0b11100001},
-        {0b01001010, 0b11010100},
-        {0b11010110, 0b01001000},
-        {0b01000010, 0b11011100},
-        {0b01010101, 0b11001011},
+        {0b10101001, 0b11110011},
+        {0b10001001, 0b11010011},
+        {0b11111001, 0b10100011},
+        {0b11011101, 0b10000111},
+        {0b11011001, 0b10000011},
+        {0b10100001, 0b11111011},
+        {0b11111011, 0b10100001},
+        {0b10000111, 0b11011101},
+        {0b11011001, 0b10000011},
+        {0b10100001, 0b11111011},
+        {0b10101111, 0b11110101},
+        {0b11111001, 0b10100011},
+        {0b11110011, 0b10101001},
+        {0b10101111, 0b11110101},
+        {0b10000101, 0b11011111},
+        {0b11011101, 0b10000111},
+        {0b10001101, 0b11010111},
+        {0b10000101, 0b11011111},
+        {0b10000011, 0b11011001},
+        {0b10100001, 0b11111011},
+        {0b10000101, 0b11011111},
+        {0b10001111, 0b11010101},
+        {0b11011001, 0b10000011},
+        {0b10101001, 0b11110011},
+        {0b11111011, 0b10100001},
+        {0b10101111, 0b11110101},
+        {0b11110011, 0b10101001},
+        {0b11111111, 0b10100101},
+        {0b10100011, 0b11111001}
     };
 
 
@@ -685,29 +699,29 @@ int main()
     std::vector<std::vector<int>> key_statistic(3, std::vector<int>(16, 0));
 
     for (const auto& pair : pairs) {
-        uint8_t R = pair.first;
-        uint8_t Rs = pair.second;
+        uint16_t R = pair.first;
+        uint16_t Rs = pair.second;
 
         uint16_t xR = expandByTable(R);
         uint16_t xRS = expandByTable(Rs);
         /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
         std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(Rs) << "\n";*/
-        std::vector<uint8_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, xR, xRS, 8);
-        std::vector<uint8_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, xR, xRS, 4);
-        std::vector<uint8_t> k13Variants = GetKeyVariants(c3NeededKeysExit1, c3NeededKeysExit2, xR, xRS, 0);
-        for (uint8_t value : k11Variants) {
+        std::vector<uint16_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, xR, xRS, 8);
+        std::vector<uint16_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, xR, xRS, 4);
+        std::vector<uint16_t> k13Variants = GetKeyVariants(c3NeededKeysExit1, c3NeededKeysExit2, xR, xRS, 0);
+        for (uint16_t value : k11Variants) {
             if (value < 16) {
                 key_statistic[0][value]++;
             }
         }
 
-        for (uint8_t value : k12Variants) {
+        for (uint16_t value : k12Variants) {
             if (value < 16) {
                 key_statistic[1][value]++;
             }
         }
 
-        for (uint8_t value : k13Variants) {
+        for (uint16_t value : k13Variants) {
             if (value < 16) {
                 key_statistic[2][value]++;
             }
@@ -721,7 +735,7 @@ int main()
             << key_statistic[1][value] << "\t"
             << key_statistic[2][value] << std::endl;
     }
-    //std::vector<uint8_t> delC3;
+    //std::vector<uint16_t> delC3;
     std::cout << "\n\n\n";
     
     //GetKeyPossibles(key_statistic, 1);
@@ -732,7 +746,7 @@ int main()
 
     std::vector<std::vector<int>> key_statistic3(3, std::vector<int>(16, 0));
         // Yr          YrS        // dYL
-    std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> pairsY = {
+    std::vector<std::tuple<uint16_t, uint16_t, uint16_t>> pairsY = {
     { 0b01101011, 0b11110101, 0b10101111 },
     { 0b11011100, 0b01000010, 0b10101101 },
     { 0b01010010, 0b11001100, 0b10101101 },
@@ -748,60 +762,60 @@ int main()
     { 0b00011010, 0b10000100, 0b10101101 },
     { 0b00010011, 0b10001101, 0b10101001 },
     };
-    std::vector<uint8_t> delYL = { 0b10101111 };
+    std::vector<uint16_t> delYL = { 0b10101111 };
     for (size_t i = 0; i < pairsY.size(); i++)
     {
-        uint8_t YR = std::get<0>(pairsY[i]);
-        uint8_t YRS = std::get<1>(pairsY[i]);
-        uint8_t delYL = std::get<2>(pairsY[i]);
+        uint16_t YR = std::get<0>(pairsY[i]);
+        uint16_t YRS = std::get<1>(pairsY[i]);
+        uint16_t delYL = std::get<2>(pairsY[i]);
 
 
-        std::vector<uint8_t> delA1Input2Y = GetXorWithParameter(input1, delA1);
-        std::vector<uint8_t> delA2Input2Y = GetXorWithParameter(input1, delA2);
-        std::vector<uint8_t> delA3Input2Y = GetXorWithParameter(input1, delA3);
+        std::vector<uint16_t> delA1Input2Y = GetXorWithParameter(input1, delA1);
+        std::vector<uint16_t> delA2Input2Y = GetXorWithParameter(input1, delA2);
+        std::vector<uint16_t> delA3Input2Y = GetXorWithParameter(input1, delA3);
 
         // Этот вход константа
-        std::vector<uint8_t> exit1DelConstY = SBlockFirstSecondExit(input1, S1);
-        std::vector<uint8_t> exit1DelConst2Y = SBlockFirstSecondExit(input1, S2);
-        std::vector<uint8_t> exit1DelConst3Y = SBlockThirdExit(input1, S3);
+        std::vector<uint16_t> exit1DelConstY = SBlockFirstSecondExit(input1, S1);
+        std::vector<uint16_t> exit1DelConst2Y = SBlockFirstSecondExit(input1, S2);
+        std::vector<uint16_t> exit1DelConst3Y = SBlockThirdExit(input1, S3);
 
         // Получили выход 2 для всего этого
-        std::vector<uint8_t> exit2DelA1Y = SBlockFirstSecondExit(delA1Input2Y, S1);
-        std::vector<uint8_t> exit2DelA2Y = SBlockFirstSecondExit(delA2Input2Y, S2);
-        std::vector<uint8_t> exit2DelA3Y = SBlockThirdExit(delA3Input2Y, S3);
+        std::vector<uint16_t> exit2DelA1Y = SBlockFirstSecondExit(delA1Input2Y, S1);
+        std::vector<uint16_t> exit2DelA2Y = SBlockFirstSecondExit(delA2Input2Y, S2);
+        std::vector<uint16_t> exit2DelA3Y = SBlockThirdExit(delA3Input2Y, S3);
 
         // Получаем дельта C
-        std::vector<uint8_t> delC1;
-        std::vector<uint8_t> delC2;
-        std::vector<uint8_t> delC3;
+        std::vector<uint16_t> delC1;
+        std::vector<uint16_t> delC2;
+        std::vector<uint16_t> delC3;
         XorTwoTables(delC1, exit1DelConst, exit2DelA1Y);
         XorTwoTables(delC2, exit1DelConst2, exit2DelA2Y);
         XorTwoTables(delC3, exit1DelConst3, exit2DelA3Y);
 
-        uint8_t delYLShuffeled = applyInversePermutation8(shuffleP8, delYL);
+        uint16_t delYLShuffeled = applyInversePermutation8(shuffleP8, delYL);
         //std::cout << "Shuffeled delYL " << std::bitset<8>(delYLShuffeled) << "\n";
-        uint8_t delC1Needed = (delYLShuffeled >> 5) & 7;
+        uint16_t delC1Needed = (delYLShuffeled >> 5) & 7;
 
-        std::vector<uint8_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
-        std::vector<uint8_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
+        std::vector<uint16_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
+        std::vector<uint16_t> c1NeededKeysExit2 = getRightCOutputs(delA1Input2, delC1, delC1Needed);
 
-        uint8_t delC2Needed = (delYLShuffeled >> 2) & 7;
+        uint16_t delC2Needed = (delYLShuffeled >> 2) & 7;
 
-        std::vector<uint8_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
-        std::vector<uint8_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
+        std::vector<uint16_t> c2NeededKeysExit1 = getRightCOutputs(input1, delC2, delC2Needed);
+        std::vector<uint16_t> c2NeededKeysExit2 = getRightCOutputs(delA2Input2, delC2, delC2Needed);
 
-        uint8_t delC3Needed = delYLShuffeled & 3;
+        uint16_t delC3Needed = delYLShuffeled & 3;
 
-        std::vector<uint8_t> c3NeededKeysExit1Y = getRightCOutputs(input1, delC3, delC3Needed);
-        std::vector<uint8_t> c3NeededKeysExit2Y = getRightCOutputs(delA3Input2, delC3, delC3Needed);
+        std::vector<uint16_t> c3NeededKeysExit1Y = getRightCOutputs(input1, delC3, delC3Needed);
+        std::vector<uint16_t> c3NeededKeysExit2Y = getRightCOutputs(delA3Input2, delC3, delC3Needed);
 
         // Ксорим два этих столбика для с R и R штрих соответсвующими битами (в данном случае 4 первых)
         uint16_t EYR = expandByTable(YR);
         uint16_t EYRS = expandByTable(YRS);
 
-        std::vector<uint8_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, EYR, EYRS, 8);
-        std::vector<uint8_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, EYR, EYRS, 4);
-        std::vector<uint8_t> k13Variants = GetKeyVariants(c3NeededKeysExit1Y, c3NeededKeysExit2Y, EYR, EYRS, 0);
+        std::vector<uint16_t> k11Variants = GetKeyVariants(c1NeededKeysExit1, c1NeededKeysExit2, EYR, EYRS, 8);
+        std::vector<uint16_t> k12Variants = GetKeyVariants(c2NeededKeysExit1, c2NeededKeysExit2, EYR, EYRS, 4);
+        std::vector<uint16_t> k13Variants = GetKeyVariants(c3NeededKeysExit1Y, c3NeededKeysExit2Y, EYR, EYRS, 0);
 
 
 
@@ -810,19 +824,19 @@ int main()
         // Получаем первые два столбика (вход1 и вход2) для deltaC2 
        
 
-        for (uint8_t value : k11Variants) {
+        for (uint16_t value : k11Variants) {
             if (value < 16) {
                 key_statistic3[0][value]++;
             }
         }
 
-        for (uint8_t value : k12Variants) {
+        for (uint16_t value : k12Variants) {
             if (value < 16) {
                 key_statistic3[1][value]++;
             }
         }
 
-        for (uint8_t value : k13Variants) {
+        for (uint16_t value : k13Variants) {
             if (value < 16) {
                 key_statistic3[2][value]++;
             }
@@ -851,9 +865,9 @@ int main()
     uint16_t dDdA = expandByTable(delD);
 
     std::cout << "\n\n\ndelD " << std::bitset<12>(dDdA) << "\n";
-    uint8_t delDdA1 = dDdA >> 8 & 15;
-    uint8_t delDdA2 = dDdA >> 4 & 15;
-    uint8_t delDdA3 = dDdA & 15;
+    uint16_t delDdA1 = dDdA >> 8 & 15;
+    uint16_t delDdA2 = dDdA >> 4 & 15;
+    uint16_t delDdA3 = dDdA & 15;
 
     int8 maxS1 = getMaxFromLine(s1_count[delDdA1]);
 
@@ -896,9 +910,9 @@ int main()
             uint16_t dDcAY = expandByTable(allDelY4[i]);
 
             //std::cout << "\n\n\ndelD " << std::bitset<12>(dDcAY) << "\n";
-            uint8_t delDvA1 = dDcAY >> 8 & 15;
-            uint8_t delDvA2 = dDcAY >> 4 & 15;
-            uint8_t delDvA3 = dDcAY & 15;
+            uint16_t delDvA1 = dDcAY >> 8 & 15;
+            uint16_t delDvA2 = dDcAY >> 4 & 15;
+            uint16_t delDvA3 = dDcAY & 15;
 
             std::vector<int8> maxS1LinesYl = getRowsFromLineVectorByMaxCount(s1_count, delDvA1, getMaxFromLine(s1_count[delDvA1]));
             std::vector<int8> maxS2LinesYl = getRowsFromLineVectorByMaxCount(s2_count, delDvA2, getMaxFromLine(s2_count[delDvA2]));
@@ -946,6 +960,6 @@ int main()
 
 
 
-    std::vector<uint8_t> c3NeededKeysExit24;
+    std::vector<uint16_t> c3NeededKeysExit24;
     std::cout << "Hello World!\n";
 }

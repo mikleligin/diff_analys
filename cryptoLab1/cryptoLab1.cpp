@@ -4,6 +4,14 @@
 #include <bitset>
 #include <map>
 #include <tuple>
+#include <algorithm>
+
+#define exit1 15
+#define exit3 3
+#define DAi 15
+#define int8 uint8_t
+#define int16 uint16_t
+
 
 std::vector<std::vector<uint8_t>> S1 = { 
     {1,5,2,6,2,6,7,3},
@@ -54,9 +62,7 @@ std::vector<uint8_t> SBlockThirdExit(std::vector<uint8_t> input1, std::vector<st
     return z;
 }
 
-#define exit1 15
-#define exit3 3
-#define DAi 15
+
 
 std::vector<uint8_t> DifXor(uint8_t input_dif, std::vector<std::vector<uint8_t>> S) {
     std::vector<uint8_t> exit_2;
@@ -408,7 +414,65 @@ uint8_t applyInversePermutation8(const std::vector<uint8_t>& P, uint8_t x)
     }
     return out;
 }
+uint8_t getMaxFromLine(std::vector<uint8_t> line) {
+    uint8_t max = 0;
+    for (size_t i = 0; i < line.size(); i++)
+    {
+        max = line[i] > max ? line[i] : max;
+    }
+    return max;
+}
 
+std::vector<uint8_t> getRowsFromLineVectorByMaxCount(std::vector<std::vector<uint8_t>> S, int8 line, int8 max) {
+    std::vector<uint8_t> row;
+    for (size_t i = 0; i < S[line].size(); i++)
+    {
+        if (S[line][i] == max)
+        {
+            row.push_back(i);
+        }
+    }
+    return row;
+}
+
+uint8_t getRowByMaxCount(std::vector<std::vector<uint8_t>> S, int8 line, int8 max) {
+    uint8_t row = 0;
+    for (size_t i = 0; i < S[line].size(); i++)
+    {
+        if (S[line][i] == max)
+        {
+            return i;
+        }
+    }
+    return row;
+}
+int getMaxIndexFromColumn(const std::vector<int>& column) {
+    int8 max = 0;
+    for (size_t i = 0; i < column.size(); i++)
+    {
+        max = column[i] > max ? column[i] : max;
+    }
+    return max;
+}
+void GetKeyPossibles(std::vector<std::vector<int>> &key_statistic, int num) {
+    int K1Max = getMaxIndexFromColumn(key_statistic[0]);
+    int K2Max = getMaxIndexFromColumn(key_statistic[1]);
+    int K3Max = getMaxIndexFromColumn(key_statistic[2]);
+
+    for (size_t i = 0; i < key_statistic[0].size(); i++)
+    {
+        for (size_t j = 0; j < key_statistic[1].size(); j++)
+        {
+            for (size_t k = 0; k < key_statistic[2].size(); k++)
+            {
+                if ((key_statistic[0][i] == K1Max) && (key_statistic[1][j] == K2Max) && (key_statistic[2][k] == K3Max))
+                {
+                    std::cout << "K" << num <<  " possible: " << std::bitset<4>(i) << std::bitset<4>(j) << std::bitset<4>(k) << "\n";
+                }
+            }
+        }
+    }
+}
 int main()
 {
     //std::cout << "S1";
@@ -658,6 +722,13 @@ int main()
             << key_statistic[2][value] << std::endl;
     }
     //std::vector<uint8_t> delC3;
+    std::cout << "\n\n\n";
+    
+    //GetKeyPossibles(key_statistic, 1);
+
+    std::cout << "\n\n==================\n";
+    // ==================================================================================== K3
+
 
     std::vector<std::vector<int>> key_statistic3(3, std::vector<int>(16, 0));
         // Yr          YrS        // dYL
@@ -708,7 +779,7 @@ int main()
         XorTwoTables(delC3, exit1DelConst3, exit2DelA3Y);
 
         uint8_t delYLShuffeled = applyInversePermutation8(shuffleP8, delYL);
-        std::cout << "Shuffeled delYL " << std::bitset<8>(delYLShuffeled) << "\n";
+        //std::cout << "Shuffeled delYL " << std::bitset<8>(delYLShuffeled) << "\n";
         uint8_t delC1Needed = (delYLShuffeled >> 5) & 7;
 
         std::vector<uint8_t> c1NeededKeysExit1 = getRightCOutputs(input1, delC1, delC1Needed);
@@ -765,7 +836,116 @@ int main()
             << key_statistic3[1][value] << "\t"
             << key_statistic3[2][value] << std::endl;
     }
-        std::vector<uint8_t> c3NeededKeysExit24;
 
+    std::cout << "\n\n\n";
+
+    //GetKeyPossibles(key_statistic3, 3);
+
+    std::cout << "\n\n==================\n";
+
+    // ======================================================================================= 5 раундов
+
+
+    // Расширяем dD
+
+    uint16_t dDdA = expandByTable(delD);
+
+    std::cout << "\n\n\ndelD " << std::bitset<12>(dDdA) << "\n";
+    uint8_t delDdA1 = dDdA >> 8 & 15;
+    uint8_t delDdA2 = dDdA >> 4 & 15;
+    uint8_t delDdA3 = dDdA & 15;
+
+    int8 maxS1 = getMaxFromLine(s1_count[delDdA1]);
+
+    std::vector<int8> maxS1Lines = getRowsFromLineVectorByMaxCount(s1_count, delDdA1, getMaxFromLine(s1_count[delDdA1]));
+    std::vector<int8> maxS2Lines = getRowsFromLineVectorByMaxCount(s2_count, delDdA2, getMaxFromLine(s2_count[delDdA2]));
+    std::vector<int8> maxS3Lines = getRowsFromLineVectorByMaxCount(s3_count, delDdA3, getMaxFromLine(s3_count[delDdA3]));
+    
+    std::vector<int8> alldelCV; // Все вариации дельта С
+    for (size_t i = 0; i < maxS1Lines.size(); i++)
+    {
+        for (size_t j = 0; j < maxS2Lines.size(); j++)
+        {
+            for (size_t k = 0; k < maxS3Lines.size(); k++)
+            {
+                alldelCV.push_back(maxS1Lines[i] << 5 | maxS2Lines[j] << 2 | maxS3Lines[k]);
+            }
+        }
+    }
+
+    /*int8 delCV = getRowByMaxCount(s1_count, delDdA1, getMaxFromLine(s1_count[delDdA1])) << 5 | getRowByMaxCount(s2_count, delDdA2, getMaxFromLine(s2_count[delDdA2])) << 2
+        | getRowByMaxCount(s3_count, delDdA3, getMaxFromLine(s3_count[delDdA3]));*/
+
+    std::vector<int8> allDelY4;
+
+    for (size_t i = 0; i < alldelCV.size(); i++)
+    {
+        //std::cout << "delV " << std::bitset<8>(alldelCV[i]) << "\n";
+
+        //std::cout << "del V after permutation " << std::bitset<8>(applyPermutation8(shuffleP8, alldelCV[i])) << " del XR " << std::bitset<8>(delXR) << "\n";
+
+        allDelY4.push_back(delXR ^ applyPermutation8(shuffleP8, alldelCV[i]));
+
+        std::cout << "delta Y R after fouth round " << std::bitset<8>(allDelY4[i]) << "\n";
+    }
+
+    std::cout << "\n\n\n";
+    // ================================================================================ delC 5
+    for (size_t i = 0; i < allDelY4.size(); i++)
+    {
+            uint16_t dDcAY = expandByTable(allDelY4[i]);
+
+            //std::cout << "\n\n\ndelD " << std::bitset<12>(dDcAY) << "\n";
+            uint8_t delDvA1 = dDcAY >> 8 & 15;
+            uint8_t delDvA2 = dDcAY >> 4 & 15;
+            uint8_t delDvA3 = dDcAY & 15;
+
+            std::vector<int8> maxS1LinesYl = getRowsFromLineVectorByMaxCount(s1_count, delDvA1, getMaxFromLine(s1_count[delDvA1]));
+            std::vector<int8> maxS2LinesYl = getRowsFromLineVectorByMaxCount(s2_count, delDvA2, getMaxFromLine(s2_count[delDvA2]));
+            std::vector<int8> maxS3LinesYl = getRowsFromLineVectorByMaxCount(s3_count, delDvA3, getMaxFromLine(s3_count[delDvA3]));
+
+            std::vector<int8> alldelCVY; // Все вариации дельта С
+            for (size_t i = 0; i < maxS1LinesYl.size(); i++)
+            {
+                for (size_t j = 0; j < maxS2LinesYl.size(); j++)
+                {
+                    for (size_t k = 0; k < maxS3LinesYl.size(); k++)
+                    {
+                        alldelCVY.push_back(maxS1LinesYl[i] << 5 | maxS2LinesYl[j] << 2 | maxS3LinesYl[k]);
+                    }
+                }
+            }
+
+            std::vector<int8> allDelYL;
+
+            for (size_t i = 0; i < alldelCVY.size(); i++)
+            {
+                //std::cout << "delV " << std::bitset<8>(alldelCVY[i]) << "\n";
+
+                //std::cout << "del C after permutation " << std::bitset<8>(applyPermutation8(shuffleP8, alldelCVY[i])) << " del XR " << std::bitset<8>(delXR) << "\n";
+
+                allDelYL.push_back(delD^ applyPermutation8(shuffleP8, alldelCVY[i]));
+
+                std::cout << "delta Y L after fouth round " << std::bitset<8>(allDelYL[i]) << "\n";
+            }
+
+            /* int8 delCV5 = getRowByMaxCount(s1_count, delDvA1, getMaxFromLine(s1_count[delDdA1])) << 5 | getRowByMaxCount(s2_count, delDvA2, getMaxFromLine(s2_count[delDvA2])) << 2
+                | getRowByMaxCount(s3_count, delDvA3, getMaxFromLine(s3_count[delDvA3]));
+
+            std::cout << "delC " << std::bitset<8>(delCV5) << "\n";
+
+            std::cout << "del C after permutation " << std::bitset<8>(applyPermutation8(shuffleP8, delCV5)) << " delD " << std::bitset<8>(delD) << "\n";
+
+            int8 delYL5 = delD ^ applyPermutation8(shuffleP8, delCV5);
+
+            std::cout << "delta Y L after fouth round " << std::bitset<8>(delYL5) << "\n";
+            */
+    }
+
+    // ================================================================================= K5 
+
+
+
+    std::vector<uint8_t> c3NeededKeysExit24;
     std::cout << "Hello World!\n";
 }

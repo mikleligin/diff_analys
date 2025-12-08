@@ -1,31 +1,31 @@
 ﻿  cryptoLab1.cpp
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(71,39): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(139,39): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
           with
           [
               _Ty=uint16_t
           ]
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(81,39): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(149,39): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
           with
           [
               _Ty=uint16_t
           ]
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(135,48): warning C4267: аргумент: преобразование из "size_t" в "uint16_t"; возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(152,50): warning C4267: аргумент: преобразование из "size_t" в "uint16_t"; возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(194,45): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(203,48): warning C4267: аргумент: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(220,50): warning C4267: аргумент: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(262,45): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
           with
           [
               _Ty=uint16_t
           ]
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(198,45): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(266,45): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
           with
           [
               _Ty=uint16_t
           ]
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(262,43): warning C4267: =: преобразование из "size_t" в "uint16_t"; возможна потеря данных
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(432,28): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(330,43): warning C4267: =: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(504,28): warning C4267: аргумент: преобразование из "size_t" в "_Ty"; возможна потеря данных
           with
           [
               _Ty=uint16_t
           ]
-D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(444,21): warning C4267: return: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+D:\dev\cryptoLab1\cryptoLab1\cryptoLab1.cpp(516,21): warning C4267: return: преобразование из "size_t" в "uint16_t"; возможна потеря данных
   cryptoLab1.vcxproj -> D:\dev\cryptoLab1\x64\Debug\cryptoLab1.exe

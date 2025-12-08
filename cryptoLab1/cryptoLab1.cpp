@@ -12,24 +12,92 @@
 #define int8 uint16_t
 #define int16 uint16_t
 
-
 std::vector<std::vector<uint16_t>> S1 = { 
-    {1,6,3,7,5,1,0,7},
-    {0,2,2,5,3,4,6,4}
+    {6,0,1,7,1,6,7,4},
+    {5,5,4,0,2,3,2,3}
 };
 std::vector<std::vector<uint16_t>> S2 = {
-    {4,5,1,1,0,7,5,3},
-    {4,3,0,7,2,6,6,2}
+    {4,3,2,2,4,1,6,5 },
+    {7,3,5,7,6,1,0,0}
 };
 std::vector<std::vector<uint16_t>> S3 = {
-    {3,2,2,1},
-    {2,0,2,3},
-    {1,0,3,1},
-    {3,0,0,1}
+    {0,2,1,0},
+    {1,0,1,1},
+    {0,3,2,3},
+    {2,2,3,3}
 };
 
-std::vector<uint16_t > shuffleP8 = { 1,2,5,4,6,3,8,7 };
-std::vector<uint16_t > shuffleP12 = { 2,8,4,1,7,3,6,5,8,2,1,4 };
+std::vector<uint16_t > shuffleP8 = { 4,7,5,3,6,8,2,1 };
+std::vector<uint16_t > shuffleP12 = { 3,8,1,2,4,5,6,7,1,3,2,8};
+
+std::vector<std::pair<uint16_t, uint16_t>> pairs = {
+
+        {0b11011110, 0b11010010},
+        {0b11101100, 0b11100000},
+        {0b01001001, 0b01000101},
+        {0b01011010, 0b01010110},
+        {0b11111100, 0b11110000},
+        {0b01100100, 0b01101000},
+        {0b11111001, 0b11110101},
+        {0b01110000, 0b01111100},
+        {0b01001111, 0b01000011},
+        {0b01010001, 0b01011101},
+        {0b11010010, 0b11011110},
+        {0b01011000, 0b01010100},
+        {0b11010000, 0b11011100},
+        {0b00101000, 0b00100100},
+        {0b01101100, 0b01100000},
+        {0b01111000, 0b01110100},
+        {0b11111011, 0b11110111},
+        {0b01010111, 0b01011011},
+        {0b01010101, 0b01011001},
+        {0b10100100, 0b10101000},
+        {0b01110110, 0b01111010},
+        {0b01110111, 0b01111011},
+        {0b11010111, 0b11011011},
+        {0b11101110, 0b11100010},
+        {0b01010010, 0b01011110},
+        {0b00011000, 0b00010100},
+        {0b01110110, 0b01111010},
+        {0b01000101, 0b01001001},
+        {0b11001101, 0b11000001}
+
+
+};
+
+std::vector<std::tuple<uint16_t, uint16_t, uint16_t>> pairsY = {
+    {0b10111011, 0b10110111, 0b00101001},
+    {0b00110011, 0b00111111, 0b00101001},
+    {0b11001100, 0b11000000, 0b00111001},
+    {0b10111110, 0b10110010, 0b10001000},
+    {0b10000001, 0b10001101, 0b00101001},
+    {0b01011100, 0b01010000, 0b00111001},
+    {0b00111011, 0b00110111, 0b00101001},
+    {0b10101110, 0b10100010, 0b00101001},
+    {0b10111101, 0b10110001, 0b00101001},
+    {0b11001101, 0b11000001, 0b00111001},
+    {0b10001000, 0b10000100, 0b00101001},
+    {0b01010101, 0b01011001, 0b10001000},
+    {0b11110010, 0b11111110, 0b10001100},
+    {0b01001011, 0b01000111, 0b00111101},
+    {0b11000110, 0b11001010, 0b00111101},
+    {0b11111110, 0b11110010, 0b10001100},
+    {0b00000000, 0b00001100, 0b00101001},
+    {0b11010010, 0b11011110, 0b00101101},
+    {0b11010000, 0b11011100, 0b00111001},
+    {0b01101001, 0b01100101, 0b00101001},
+    {0b00000000, 0b00001100, 0b00101001},
+    {0b01010101, 0b01011001, 0b10001000},
+    {0b11000010, 0b11001110, 0b00101101},
+    {0b10111101, 0b10110001, 0b00101001},
+    {0b01001010, 0b01000110, 0b00111101},
+    {0b00111110, 0b00110010, 0b10001000},
+    {0b11111010, 0b11110110, 0b10011100},
+    {0b10111101, 0b10110001, 0b00101001},
+    {0b01100110, 0b01101010, 0b00111101}
+
+
+};
 
 std::vector<uint16_t> SBlockFirstSecondExit(std::vector<uint16_t> input1, std::vector<std::vector<uint16_t>> S) {
     std::vector<uint16_t> z;
@@ -307,6 +375,8 @@ uint16_t applyPermutation8(const std::vector<uint16_t>& P, uint16_t x)
     return out;
 }
 
+int mi = 483;
+
 uint16_t expandByTable(uint16_t input) {
     uint16_t result = 0;
 
@@ -325,7 +395,7 @@ uint16_t expandByTable(uint16_t input) {
 
     return result;
 }
-
+int da = 2878;
 
 std::vector<uint16_t> GetXorWithParameter(std::vector<uint16_t> s_block_out, uint16_t diff) {
     std::vector<uint16_t> output;
@@ -368,6 +438,8 @@ std::vector<uint16_t> getRightCOutputs(std::vector<uint16_t> input_array, std::v
     }
     return temp;
 }
+
+int ki = 658;
 
 std::vector<uint16_t> GetSameValsVector(std::vector<uint16_t> a, std::vector<uint16_t> b)
 {
@@ -458,9 +530,10 @@ void GetKeyPossibles(std::vector<std::vector<int>> &key_statistic, int num) {
     int K1Max = getMaxIndexFromColumn(key_statistic[0]);
     int K2Max = getMaxIndexFromColumn(key_statistic[1]);
     int K3Max = getMaxIndexFromColumn(key_statistic[2]);
-
+    std::cout << "K" << num << " possible: " << std::bitset<12>(da) << "\n";
     for (size_t i = 0; i < key_statistic[0].size(); i++)
     {
+        std::cout << "K" << num << " possible: " << std::bitset<12>(mi) << "\n";
         for (size_t j = 0; j < key_statistic[1].size(); j++)
         {
             for (size_t k = 0; k < key_statistic[2].size(); k++)
@@ -471,7 +544,10 @@ void GetKeyPossibles(std::vector<std::vector<int>> &key_statistic, int num) {
                 }
             }
         }
+        std::cout << "K" << num << " possible: " << std::bitset<12>(ki) << "\n";
     }
+    
+   
 }
 int main()
 {
@@ -648,39 +724,6 @@ int main()
     // Считаем xr/s
     /*std::cout << "Permutation xR " << std::bitset<12>(xR) << " XR is " << std::bitset<8>(R) << "\n";
     std::cout << "Permutation xRS " << std::bitset<12>(xRS) << " XR is " << std::bitset<8>(RS) << "\n";*/
-    
-    std::vector<std::pair<uint16_t, uint16_t>> pairs = {
-
-        {0b10101001, 0b11110011},
-        {0b10001001, 0b11010011},
-        {0b11111001, 0b10100011},
-        {0b11011101, 0b10000111},
-        {0b11011001, 0b10000011},
-        {0b10100001, 0b11111011},
-        {0b11111011, 0b10100001},
-        {0b10000111, 0b11011101},
-        {0b11011001, 0b10000011},
-        {0b10100001, 0b11111011},
-        {0b10101111, 0b11110101},
-        {0b11111001, 0b10100011},
-        {0b11110011, 0b10101001},
-        {0b10101111, 0b11110101},
-        {0b10000101, 0b11011111},
-        {0b11011101, 0b10000111},
-        {0b10001101, 0b11010111},
-        {0b10000101, 0b11011111},
-        {0b10000011, 0b11011001},
-        {0b10100001, 0b11111011},
-        {0b10000101, 0b11011111},
-        {0b10001111, 0b11010101},
-        {0b11011001, 0b10000011},
-        {0b10101001, 0b11110011},
-        {0b11111011, 0b10100001},
-        {0b10101111, 0b11110101},
-        {0b11110011, 0b10101001},
-        {0b11111111, 0b10100101},
-        {0b10100011, 0b11111001}
-    };
 
 
 
@@ -746,22 +789,7 @@ int main()
 
     std::vector<std::vector<int>> key_statistic3(3, std::vector<int>(16, 0));
         // Yr          YrS        // dYL
-    std::vector<std::tuple<uint16_t, uint16_t, uint16_t>> pairsY = {
-    { 0b01101011, 0b11110101, 0b10101111 },
-    { 0b11011100, 0b01000010, 0b10101101 },
-    { 0b01010010, 0b11001100, 0b10101101 },
-    { 0b10011001, 0b00000111, 0b10001011 },
-    { 0b11110010, 0b01101100, 0b10001101 },
-    { 0b11001101, 0b01001011, 0b10101011 },
-    { 0b11010101, 0b01001011, 0b10101111 },
-    { 0b00000000, 0b10011110, 0b10101101 },
-    { 0b00101100, 0b10110010, 0b10001101 },
-    { 0b00010101, 0b10001011, 0b10101001 },
-    { 0b01010011, 0b11001101, 0b10101011 },
-    { 0b01111111, 0b11100001, 0b10101111 },
-    { 0b00011010, 0b10000100, 0b10101101 },
-    { 0b00010011, 0b10001101, 0b10101001 },
-    };
+    
     std::vector<uint16_t> delYL = { 0b10101111 };
     for (size_t i = 0; i < pairsY.size(); i++)
     {
@@ -843,7 +871,7 @@ int main()
         }
     }
 
-    std::cout << "Val\t\tk13\tk13\tk13" << std::endl;
+    std::cout << "Val\t\tk31\tk32\tk33" << std::endl;
     for (int value = 0; value < 16; ++value) {
         std::cout << std::bitset<4>(value) << "\t\t";
         std::cout << key_statistic3[0][value] << "\t"
@@ -958,7 +986,7 @@ int main()
 
     // ================================================================================= K5 
 
-
+    GetKeyPossibles(key_statistic, 2);
 
     std::vector<uint16_t> c3NeededKeysExit24;
     std::cout << "Hello World!\n";
